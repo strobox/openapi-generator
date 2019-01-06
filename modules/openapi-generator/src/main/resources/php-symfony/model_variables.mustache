@@ -4,7 +4,7 @@
      *
     {{/description}}
      * @var {{{vendorExtensions.x-commentType}}}{{^required}}|null{{/required}}
-     * @SerializedName("{{baseName}}")
+     * _@SerializedName("{{baseName}}")
 {{#required}}
      * @Assert\NotNull()
 {{/required}}
@@ -27,22 +27,22 @@
     {{/items}}
      * })
      {{#items}}
-     * @Type("array<{{dataType}}>")
+     * _@Type("array<{{dataType}}>")
      {{/items}}
 {{/isContainer}}
 {{^isContainer}}
     {{#isDate}}
      * @Assert\Date()
-     * @Type("DateTime")
+     * _@Type("DateTime")
     {{/isDate}}
     {{#isDateTime}}
      * @Assert\DateTime()
-     * @Type("DateTime")
+     * _@Type("DateTime")
     {{/isDateTime}}
     {{^isDate}}
     {{^isDateTime}}
      * @Assert\Type("{{dataType}}")
-     * @Type("{{dataType}}")
+     * _@Type("{{dataType}}")
     {{/isDateTime}}
     {{/isDate}}
 {{/isContainer}}

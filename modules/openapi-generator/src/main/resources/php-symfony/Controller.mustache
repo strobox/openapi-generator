@@ -19,10 +19,10 @@
 
 namespace {{controllerPackage}};
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller as BaseController;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as BaseController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use {{servicePackage}}\SerializerInterface;
+use {{servicePackage}}\DecoratedSerializer;
 use {{servicePackage}}\ValidatorInterface;
 
 /**
@@ -39,14 +39,14 @@ class Controller extends BaseController
     protected $serializer;
     protected $apiServer;
 
+    public function __construct(DecoratedSerializer $serializer)
+    {
+        $this->serializer = $serializer;
+    }
+
     public function setValidator(ValidatorInterface $validator)
     {
         $this->validator = $validator;
-    }
-
-    public function setSerializer(SerializerInterface $serializer)
-    {
-        $this->serializer = $serializer;
     }
 
     public function setApiServer($server)
@@ -137,7 +137,7 @@ class Controller extends BaseController
             return null;
         }
 
-        if (!$this->container->get('kernel')->isDebug()) {
+        if (!$this->container->get('parameter_bag')->get('kernel.debug')) {
             return [
                 'message'  => $exception->getMessage(),
             ];
@@ -158,19 +158,22 @@ class Controller extends BaseController
         if (in_array('*/*', $accept) || in_array('application/*', $accept)) {
             // Prefer JSON if the client has no preference
             if (in_array('application/json', $produced)) {
-                return 'application/json';
+                return 'json';
             }
             if (in_array('application/xml', $produced)) {
-                return 'application/xml';
+                return 'xml';
+            }
+            if (1==count($accept) && $accept[0] == '*/*') {
+                return 'json';
             }
         }
 
         if (in_array('application/json', $accept) && in_array('application/json', $produced)) {
-            return 'application/json';
+            return 'json';
         }
 
         if (in_array('application/xml', $accept) && in_array('application/xml', $produced)) {
-            return 'application/xml';
+            return 'xml';
         }
 
         // If we reach this point, we don't have a common ground between server and client
