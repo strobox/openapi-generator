@@ -2,7 +2,7 @@
 
 {{#operations}}/**
  * {{controllerName}}
- * PHP version 5
+ * PHP version ^7.1.3
  *
  * @category Class
  * @package  {{controllerPackage}}
@@ -20,7 +20,6 @@
 namespace {{controllerPackage}};
 
 use \Exception;
-use JMS\Serializer\Exception\RuntimeException as SerializerRuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -103,6 +102,10 @@ class {{controllerName}} extends Controller
         {{/isOAuth}}
         {{/authMethods}}
 
+        {{#allParams}}
+        ${{paramName}}DataType = '{{dataType}}';
+
+        {{/allParams}}
         // Read out all input parameter values into variables
         {{#queryParams}}
         ${{paramName}} = $request->query->get('{{paramName}}');
@@ -120,9 +123,15 @@ class {{controllerName}} extends Controller
         {{/formParams}}
         {{#bodyParams}}
         ${{paramName}} = $request->getContent();
+        // Try use extened types
+        ${{paramName}}DataType = $this->getOverridenModelType(${{paramName}}DataType) ?? ${{paramName}}DataType;
+        {{#isContainer}}
+        // Because is container:
+        ${{paramName}}DataType = "array<{${{paramName}}DataType}>";
+        {{/isContainer}}
         {{/bodyParams}}
 
-        // Use the default value if no value was provided
+         // Use the default value if no value was provided
         {{^required}}
         {{#isContainer}}
         {{#items}}
@@ -138,24 +147,18 @@ class {{controllerName}} extends Controller
         {{/isContainer}}
         {{/required}}
 
-        {{#hasParams}}
         // Deserialize the input values that needs it
-        try {
-            {{#allParams}}
-            {{^isFile}}
-            {{#isBodyParam}}
-            ${{paramName}} = $this->deserialize(${{paramName}}, '{{#isContainer}}{{#items}}array<{{dataType}}>{{/items}}{{/isContainer}}{{^isContainer}}{{dataType}}{{/isContainer}}', $inputFormat);
-            {{/isBodyParam}}
-            {{^isBodyParam}}
-            ${{paramName}} = $this->deserialize(${{paramName}}, '{{#isContainer}}array<{{#collectionFormat}}{{collectionFormat}}{{/collectionFormat}}{{^collectionFormat}}csv{{/collectionFormat}},{{dataType}}>{{/isContainer}}{{^isContainer}}{{dataType}}{{/isContainer}}', 'string');
-            {{/isBodyParam}}
-            {{/isFile}}
-            {{/allParams}}
-        } catch (SerializerRuntimeException $exception) {
-            return $this->createBadRequestResponse($exception->getMessage());
-        }
+        {{#allParams}}
+        {{^isFile}}
+        {{#isBodyParam}}
+        ${{paramName}} = $this->deserialize(${{paramName}}, ${{paramName}}DataType, $inputFormat);
+        {{/isBodyParam}}
+        {{^isBodyParam}}
+        ${{paramName}} = $this->deserialize(${{paramName}}, {{#isContainer}}"array<{{#collectionFormat}}{{collectionFormat}}{{/collectionFormat}}{{^collectionFormat}}csv{{/collectionFormat}},{${{paramName}}DataType}>"{{/isContainer}}{{^isContainer}}'{{dataType}}'{{/isContainer}}, 'string');
+        {{/isBodyParam}}
+        {{/isFile}}
+        {{/allParams}}
 
-        {{/hasParams}}
         // Validate the input values
 {{>api_input_validation}}
 
@@ -185,7 +188,7 @@ class {{controllerName}} extends Controller
             }
 
             return new Response(
-                $result !== null ?$this->serialize($result, $responseFormat):'',
+                $result?$this->serialize($result, $responseFormat):'',
                 $responseCode,
                 array_merge(
                     $responseHeaders,
@@ -208,6 +211,11 @@ class {{controllerName}} extends Controller
     public function getApiHandler()
     {
         return $this->apiServer->getApiHandler('{{pathPrefix}}');
+    }
+
+    private function getOverridenModelType(string $model)
+    {
+        return $this->apiServer->getModelsOverrides()[$model];
     }
 }
 {{/operations}}

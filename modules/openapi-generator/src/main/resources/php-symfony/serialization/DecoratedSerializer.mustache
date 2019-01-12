@@ -32,7 +32,7 @@ class DecoratedSerializer
             return $this->deserializeString($data, $type);
         }
 
-        // If we end up here, let JMS serializer handle the deserialization
+        // If we end up here, let Symfony serializer handle the deserialization
         return $this->decorated->deserialize($data, $type, $this->convertFormat($format));
     }
 

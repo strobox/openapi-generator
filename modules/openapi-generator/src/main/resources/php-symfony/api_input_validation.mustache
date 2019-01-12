@@ -35,7 +35,13 @@
         $asserts[] = new Assert\File();
     {{/isFile}}
     {{^isFile}}
+        {{#isBodyParam}}
+        $asserts[] = new Assert\Type(${{paramName}}DataType);
+        {{/isBodyParam}}
+        {{^isBodyParam}}
         $asserts[] = new Assert\Type("{{dataType}}");
+        {{/isBodyParam}}
+
     {{/isFile}}
     {{/isDateTime}}
     {{/isDate}}

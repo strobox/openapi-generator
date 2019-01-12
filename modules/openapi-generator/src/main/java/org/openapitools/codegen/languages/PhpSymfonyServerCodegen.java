@@ -304,6 +304,7 @@ public class PhpSymfonyServerCodegen extends AbstractPhpCodegen implements Codeg
         supportingFiles.add(new SupportingFile("Controller.mustache", toSrcPath(controllerPackage, srcBasePath), "Controller.php"));
         supportingFiles.add(new SupportingFile("Bundle.mustache", "", bundleClassName + ".php"));
         supportingFiles.add(new SupportingFile("Extension.mustache", dependencyInjectionDir, bundleExtensionName + ".php"));
+        supportingFiles.add(new SupportingFile("Configuration.mustache", dependencyInjectionDir, "Configuration.php"));
         supportingFiles.add(new SupportingFile("ApiPass.mustache", dependencyInjectionDir + File.separator + "Compiler", bundleName + "ApiPass.php"));
         supportingFiles.add(new SupportingFile("ApiServer.mustache", toSrcPath(apiPackage, srcBasePath), "ApiServer.php"));
 

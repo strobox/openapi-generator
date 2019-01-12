@@ -38,6 +38,24 @@ class ApiServer
     private $apis = array();
 
     /**
+     * @var array
+     */
+    private $modelsOverrides = array();
+
+    public function __construct(array $modelsOverrides)
+    {
+        $this->modelsOverrides = $modelsOverrides;
+    }
+
+    /**
+     * @return array
+     */
+    public function getModelsOverrides(): array
+    {
+        return $this->modelsOverrides;
+    }
+
+    /**
      * Adds an API handler to the server.
      *
      * @param string $api An API name of the handle

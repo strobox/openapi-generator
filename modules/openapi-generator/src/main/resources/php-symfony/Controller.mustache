@@ -22,6 +22,7 @@ namespace {{controllerPackage}};
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as BaseController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use {{apiPackage}}\ApiServer;
 use {{servicePackage}}\DecoratedSerializer;
 use {{servicePackage}}\ValidatorInterface;
 
@@ -37,6 +38,9 @@ class Controller extends BaseController
 {
     protected $validator;
     protected $serializer;
+    /**
+     * @var ApiServer
+     */
     protected $apiServer;
 
     public function __construct(DecoratedSerializer $serializer)

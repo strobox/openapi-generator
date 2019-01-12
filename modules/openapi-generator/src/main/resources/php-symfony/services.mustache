@@ -19,6 +19,7 @@ services:
 
     {{bundleAlias}}.api.api_server:
         class: {{apiPackage}}\ApiServer
+        arguments: ['%{{bundleAlias}}.models_overrides%'] # set via bundle user via {{bundleAlias}}.yml
 
     {{bundleAlias}}.service.validator:
         class: '%{{bundleAlias}}.validator%'
