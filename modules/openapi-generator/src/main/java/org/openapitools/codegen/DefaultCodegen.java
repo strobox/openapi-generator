@@ -4604,6 +4604,9 @@ public class DefaultCodegen implements CodegenConfig {
                 codegenParameter.paramName = toParamName(codegenParameter.baseName);
                 codegenParameter.baseType = codegenModel.classname;
                 codegenParameter.dataType = getTypeDeclaration(codegenModel.classname);
+                codegenParameter.haveDescendantsTypes = schema.getDiscriminator()!=null;
+                if(codegenParameter.haveDescendantsTypes)
+                    codegenParameter.discriminatorPropName = schema.getDiscriminator().getPropertyName();
                 codegenParameter.description = codegenModel.description;
                 imports.add(codegenParameter.baseType);
             } else {

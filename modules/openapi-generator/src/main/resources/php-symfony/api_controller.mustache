@@ -102,10 +102,6 @@ class {{controllerName}} extends Controller
         {{/isOAuth}}
         {{/authMethods}}
 
-        {{#allParams}}
-        ${{paramName}}DataType = '{{dataType}}';
-
-        {{/allParams}}
         // Read out all input parameter values into variables
         {{#queryParams}}
         ${{paramName}} = $request->query->get('{{paramName}}');
@@ -122,9 +118,14 @@ class {{controllerName}} extends Controller
         {{/isFile}}
         {{/formParams}}
         {{#bodyParams}}
-        ${{paramName}} = $request->getContent();
+        ${{paramName}} = ${{paramName}}RawBody = $request->getContent();
+        {{/bodyParams}}
+        {{#allParams}}
+        ${{paramName}}DataType = '{{dataType}}';
+        {{/allParams}}
+        {{#bodyParams}}
         // Try use extened types
-        ${{paramName}}DataType = $this->getOverridenModelType(${{paramName}}DataType) ?? ${{paramName}}DataType;
+        ${{paramName}}DataType = $this->getOverridenModelType(${{paramName}}DataType);
         {{#isContainer}}
         // Because is container:
         ${{paramName}}DataType = "array<{${{paramName}}DataType}>";
@@ -146,12 +147,21 @@ class {{controllerName}} extends Controller
         {{/defaultValue}}
         {{/isContainer}}
         {{/required}}
-
         // Deserialize the input values that needs it
         {{#allParams}}
         {{^isFile}}
         {{#isBodyParam}}
-        ${{paramName}} = $this->deserialize(${{paramName}}, ${{paramName}}DataType, $inputFormat);
+        ${{paramName}} = $this->deserialize(${{paramName}}RawBody, ${{paramName}}DataType, $inputFormat);
+        {{#haveDescendantsTypes}}
+        if(${{paramName}}
+                && method_exists(${{paramName}},'getDescendantByDiscriminator')) {
+            ${{paramName}}DescDataType = ${{paramName}}->getDescendantByDiscriminator('{{discriminatorPropName}}');
+            if(${{paramName}}DescDataType) {
+                ${{paramName}}DataType = $this->getOverridenModelType(${{paramName}}DescDataType);
+                ${{paramName}} = $this->deserialize(${{paramName}}RawBody, ${{paramName}}DataType, $inputFormat);
+            }
+        }
+        {{/haveDescendantsTypes}}
         {{/isBodyParam}}
         {{^isBodyParam}}
         ${{paramName}} = $this->deserialize(${{paramName}}, {{#isContainer}}"array<{{#collectionFormat}}{{collectionFormat}}{{/collectionFormat}}{{^collectionFormat}}csv{{/collectionFormat}},{${{paramName}}DataType}>"{{/isContainer}}{{^isContainer}}'{{dataType}}'{{/isContainer}}, 'string');
@@ -215,7 +225,7 @@ class {{controllerName}} extends Controller
 
     private function getOverridenModelType(string $model)
     {
-        return $this->apiServer->getModelsOverrides()[$model];
+        return $this->apiServer->getModelsOverrides()[$model] ?? $model;
     }
 }
 {{/operations}}

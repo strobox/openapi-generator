@@ -24,10 +24,10 @@ import java.util.Map;
 
 public class CodegenParameter {
     public boolean isFormParam, isQueryParam, isPathParam, isHeaderParam,
-            isCookieParam, isBodyParam, hasMore, isContainer,
+            isCookieParam, isBodyParam, hasMore, isContainer, haveDescendantsTypes,
             secondaryParam, isCollectionFormatMulti, isPrimitiveType, isModel;
     public String baseName, paramName, dataType, datatypeWithEnum, dataFormat,
-            collectionFormat, description, unescapedDescription, baseType, defaultValue, enumName;
+            collectionFormat, description, unescapedDescription, baseType, defaultValue, enumName, discriminatorPropName;
 
     public String example; // example value (x-example)
     public String jsonSchema;
@@ -107,11 +107,13 @@ public class CodegenParameter {
         output.dataType = this.dataType;
         output.datatypeWithEnum = this.datatypeWithEnum;
         output.enumName = this.enumName;
+        output.discriminatorPropName = this.discriminatorPropName;
         output.dataFormat = this.dataFormat;
         output.collectionFormat = this.collectionFormat;
         output.isCollectionFormatMulti = this.isCollectionFormatMulti;
         output.isPrimitiveType = this.isPrimitiveType;
         output.isModel = this.isModel;
+        output.haveDescendantsTypes = this.haveDescendantsTypes;
         output.description = this.description;
         output.unescapedDescription = this.unescapedDescription;
         output.baseType = this.baseType;
@@ -207,6 +209,8 @@ public class CodegenParameter {
             return false;
         if (isModel != that.isModel)
             return false;
+        if (haveDescendantsTypes != that.haveDescendantsTypes)
+            return false;
         if (baseName != null ? !baseName.equals(that.baseName) : that.baseName != null)
             return false;
         if (paramName != null ? !paramName.equals(that.paramName) : that.paramName != null)
@@ -216,6 +220,8 @@ public class CodegenParameter {
         if (datatypeWithEnum != null ? !datatypeWithEnum.equals(that.datatypeWithEnum) : that.datatypeWithEnum != null)
             return false;
         if (enumName != null ? !enumName.equals(that.enumName) : that.enumName != null)
+            return false;
+        if (discriminatorPropName != null ? !discriminatorPropName.equals(that.discriminatorPropName) : that.discriminatorPropName != null)
             return false;
         if (dataFormat != null ? !dataFormat.equals(that.dataFormat) : that.dataFormat != null)
             return false;
@@ -323,11 +329,13 @@ public class CodegenParameter {
         result = 31 * result + (isCollectionFormatMulti ? 13 : 31);
         result = 31 * result + (isPrimitiveType ? 13 : 31);
         result = 31 * result + (isModel ? 13 : 31);
+        result = 31 * result + (haveDescendantsTypes ? 13 : 31);
         result = 31 * result + (baseName != null ? baseName.hashCode() : 0);
         result = 31 * result + (paramName != null ? paramName.hashCode() : 0);
         result = 31 * result + (dataType != null ? dataType.hashCode() : 0);
         result = 31 * result + (datatypeWithEnum != null ? datatypeWithEnum.hashCode() : 0);
         result = 31 * result + (enumName != null ? enumName.hashCode() : 0);
+        result = 31 * result + (discriminatorPropName != null ? discriminatorPropName.hashCode() : 0);
         result = 31 * result + (dataFormat != null ? dataFormat.hashCode() : 0);
         result = 31 * result + (collectionFormat != null ? collectionFormat.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
@@ -392,6 +400,7 @@ public class CodegenParameter {
                 ", isCollectionFormatMulti=" + isCollectionFormatMulti +
                 ", isPrimitiveType=" + isPrimitiveType +
                 ", isModel=" + isModel +
+                ", haveDescendantsTypes=" + haveDescendantsTypes +
                 ", baseName='" + baseName + '\'' +
                 ", paramName='" + paramName + '\'' +
                 ", dataType='" + dataType + '\'' +
@@ -403,6 +412,7 @@ public class CodegenParameter {
                 ", baseType='" + baseType + '\'' +
                 ", defaultValue='" + defaultValue + '\'' +
                 ", enumName='" + enumName + '\'' +
+                ", discriminatorPropName='" + discriminatorPropName + '\'' +
                 ", example='" + example + '\'' +
                 ", jsonSchema='" + jsonSchema + '\'' +
                 ", isString=" + isString +
