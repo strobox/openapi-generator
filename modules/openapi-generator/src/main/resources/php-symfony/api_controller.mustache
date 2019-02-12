@@ -118,7 +118,7 @@ class {{controllerName}} extends Controller
         {{/isFile}}
         {{/formParams}}
         {{#bodyParams}}
-        ${{paramName}} = ${{paramName}}RawBody = $request->getContent();
+        ${{paramName}} = ${{paramName}}RawBody = $request->getContent({{#isFile}}true{{/isFile}});
         {{/bodyParams}}
         {{#allParams}}
         ${{paramName}}DataType = '{{dataType}}';
