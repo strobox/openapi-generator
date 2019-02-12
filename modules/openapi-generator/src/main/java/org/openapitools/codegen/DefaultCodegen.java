@@ -4487,6 +4487,15 @@ public class DefaultCodegen implements CodegenConfig {
             throw new RuntimeException("Request body cannot be null. Possible cause: missing schema in body parameter (OAS v2): " + body);
         }
 
+        if (ModelUtils.isComposedSchema(schema)) {
+            List<Schema> schemaList = ModelUtils.getInterfaces((ComposedSchema) schema);
+            if(schemaList.size() > 1) {
+                schema = schemaList.get(0);
+                LOGGER.warn("Multiple schemas defined. Using only the first one: {}. To fully utilize allOf, please use $ref instead of inline schema definition", schema);
+
+            }
+        }
+
         if (StringUtils.isNotBlank(schema.get$ref())) {
             name = ModelUtils.getSimpleRef(schema.get$ref());
         }
