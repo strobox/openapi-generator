@@ -2,7 +2,7 @@
 /**
  * {{bundleExtensionName}}
  *
- * PHP version 5
+ * PHP version ^7.1.3
  *
  * @category Class
  * @package  {{invokerPackage}}\DependencyInjection
@@ -34,8 +34,14 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
  */
 class {{bundleExtensionName}} extends Extension
 {
+
     public function load(array $configs, ContainerBuilder $container)
     {
+        $configuration = new Configuration();
+        $config = $this->processConfiguration($configuration, $configs);
+
+        $container->setParameter($this->getAlias().'.models_overrides', $config['models_overrides']??array());
+
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
     }

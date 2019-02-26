@@ -180,6 +180,14 @@ public class PhpSymfonyServerCodegen extends AbstractPhpCodegen implements Codeg
         cliOptions.add(new CliOption(CodegenConstants.HIDE_GENERATION_TIMESTAMP, CodegenConstants.HIDE_GENERATION_TIMESTAMP_DESC)
                 .defaultValue(Boolean.TRUE.toString()));
         cliOptions.add(new CliOption(PHP_LEGACY_SUPPORT, "Should the generated code be compatible with PHP 5.x?").defaultValue(Boolean.TRUE.toString()));
+
+        for (CliOption co : cliOptions) {
+            if (co.getOpt().equals(AbstractPhpCodegen.VARIABLE_NAMING_CONVENTION)) {
+                co.setDescription("naming convention of variable name, e.g. camelCase.");
+                co.setDefault("camelCase");
+                break;
+            }
+        }
     }
 
     public String getBundleName() {
@@ -296,14 +304,13 @@ public class PhpSymfonyServerCodegen extends AbstractPhpCodegen implements Codeg
         supportingFiles.add(new SupportingFile("Controller.mustache", toSrcPath(controllerPackage, srcBasePath), "Controller.php"));
         supportingFiles.add(new SupportingFile("Bundle.mustache", "", bundleClassName + ".php"));
         supportingFiles.add(new SupportingFile("Extension.mustache", dependencyInjectionDir, bundleExtensionName + ".php"));
+        supportingFiles.add(new SupportingFile("Configuration.mustache", dependencyInjectionDir, "Configuration.php"));
         supportingFiles.add(new SupportingFile("ApiPass.mustache", dependencyInjectionDir + File.separator + "Compiler", bundleName + "ApiPass.php"));
         supportingFiles.add(new SupportingFile("ApiServer.mustache", toSrcPath(apiPackage, srcBasePath), "ApiServer.php"));
 
         // Serialization components
-        supportingFiles.add(new SupportingFile("serialization/SerializerInterface.mustache", toSrcPath(servicePackage, srcBasePath), "SerializerInterface.php"));
-        supportingFiles.add(new SupportingFile("serialization/JmsSerializer.mustache", toSrcPath(servicePackage, srcBasePath), "JmsSerializer.php"));
-        supportingFiles.add(new SupportingFile("serialization/StrictJsonDeserializationVisitor.mustache", toSrcPath(servicePackage, srcBasePath), "StrictJsonDeserializationVisitor.php"));
-        supportingFiles.add(new SupportingFile("serialization/TypeMismatchException.mustache", toSrcPath(servicePackage, srcBasePath), "TypeMismatchException.php"));
+        supportingFiles.add(new SupportingFile("serialization/DecoratedSerializer.mustache", toSrcPath(servicePackage, srcBasePath), "DecoratedSerializer.php"));
+
         // Validation components
         supportingFiles.add(new SupportingFile("validation/ValidatorInterface.mustache", toSrcPath(servicePackage, srcBasePath), "ValidatorInterface.php"));
         supportingFiles.add(new SupportingFile("validation/SymfonyValidator.mustache", toSrcPath(servicePackage, srcBasePath), "SymfonyValidator.php"));

@@ -31,11 +31,17 @@
     {{/isDateTime}}
     {{^isDate}}
     {{^isDateTime}}
-    {{#isFile}}
+    {{#isFile}}{{^isBodyParam}}
         $asserts[] = new Assert\File();
-    {{/isFile}}
+    {{/isBodyParam}}{{/isFile}}
     {{^isFile}}
+        {{#isBodyParam}}
+        $asserts[] = new Assert\Type(${{paramName}}DataType);
+        {{/isBodyParam}}
+        {{^isBodyParam}}
         $asserts[] = new Assert\Type("{{dataType}}");
+        {{/isBodyParam}}
+
     {{/isFile}}
     {{/isDateTime}}
     {{/isDate}}
@@ -81,8 +87,14 @@
         ]);
     {{/minItems}}
 {{/hasValidation}}
+        {{#isFile}}{{#isBodyParam}}
+         /* Disable validation for files in body (Maybe temp disable)
+        {{/isBodyParam}}{{/isFile}}
         $response = $this->validate(${{paramName}}, $asserts);
         if ($response instanceof Response) {
             return $response;
         }
+        {{#isFile}}{{#isBodyParam}}
+         */
+        {{/isBodyParam}}{{/isFile}}
 {{/allParams}}

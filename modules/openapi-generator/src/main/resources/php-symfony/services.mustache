@@ -3,18 +3,23 @@
 # Do not edit the class manually.
 
 parameters:
-    {{bundleAlias}}.serializer: '{{servicePackage}}\JmsSerializer'
+    {{bundleAlias}}.serializer: '{{servicePackage}}\DecoratedSerializer'
     {{bundleAlias}}.validator:  '{{servicePackage}}\SymfonyValidator'
 
 services:
-    {{bundleAlias}}.api.api_server:
-        class: {{apiPackage}}\ApiServer
-
-    {{bundleAlias}}.model.model_serializer:
-        class: {{modelPackage}}\ModelSerializer
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: true
 
     {{bundleAlias}}.service.serializer:
         class: '%{{bundleAlias}}.serializer%'
+
+    '%{{bundleAlias}}.serializer%': '@{{bundleAlias}}.service.serializer'
+
+    {{bundleAlias}}.api.api_server:
+        class: {{apiPackage}}\ApiServer
+        arguments: ['%{{bundleAlias}}.models_overrides%'] # set via bundle user via {{bundleAlias}}.yml
 
     {{bundleAlias}}.service.validator:
         class: '%{{bundleAlias}}.validator%'
@@ -23,9 +28,9 @@ services:
 {{#apis}}
 {{#operations}}
     {{bundleAlias}}.controller.{{pathPrefix}}:
+        public: true
         class: {{controllerPackage}}\{{baseName}}Controller
         calls:
-         - [setSerializer, ['@{{bundleAlias}}.service.serializer']]
          - [setValidator,  ['@{{bundleAlias}}.service.validator']]
          - [setApiServer,  ['@{{bundleAlias}}.api.api_server']]
         tags: ['controller.service_arguments']

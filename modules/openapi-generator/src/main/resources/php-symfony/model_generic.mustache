@@ -1,5 +1,22 @@
 class {{classname}} {{#parentSchema}}extends {{{parent}}} {{/parentSchema}}
 {
+{{#discriminator}}
+    /**
+     * Gets type by discriminator.
+     *
+     * @return string|null
+     */
+    public function getDescendantByDiscriminator($propertyName) {
+        $map = array('{{propertyName}}' => array(
+            {{#mappedModels}}
+            '{{mappingName}}' => '{{modelPackage}}\{{modelName}}',
+            {{/mappedModels}}
+        ));
+        if(isset($map[$propertyName]))
+            return $map[$propertyName][$this->$propertyName] ?? null;
+        return null;
+    }
+{{/discriminator}}
     {{#vars}}{{>model_variables}}
     {{/vars}}
     /**
@@ -8,6 +25,7 @@ class {{classname}} {{#parentSchema}}extends {{{parent}}} {{/parentSchema}}
      */
     public function __construct(array $data = null)
     {
+
         {{#parentSchema}}
         parent::__construct($data);
 
