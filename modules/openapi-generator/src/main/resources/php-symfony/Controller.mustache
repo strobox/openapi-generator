@@ -101,6 +101,8 @@ class Controller extends BaseController
      */
     protected function serialize($data, $format)
     {
+        if('text'==$format)
+            return strval($data);
         return $this->serializer->serialize($data, $format);
     }
 
@@ -154,6 +156,12 @@ class Controller extends BaseController
         ];
     }
 
+    const CONTENT_TYPE_TO_FORMAT = [
+        'application/json' => 'json',
+        'application/xml' => 'xml',
+        'text/plain' => 'text'
+    ];
+
     protected function getOutputFormat($accept, array $produced)
     {
         // Figure out what the client accepts
@@ -172,12 +180,10 @@ class Controller extends BaseController
             }
         }
 
-        if (in_array('application/json', $accept) && in_array('application/json', $produced)) {
-            return 'json';
-        }
-
-        if (in_array('application/xml', $accept) && in_array('application/xml', $produced)) {
-            return 'xml';
+        foreach (Controller::CONTENT_TYPE_TO_FORMAT as $cType => $format) {
+            if (in_array($cType, $accept) && in_array($cType, $produced)) {
+                return $format;
+            }
         }
 
         // If we reach this point, we don't have a common ground between server and client
